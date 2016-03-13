@@ -2,10 +2,10 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
-    SECURET_KEY = os.environ.get('SECRET_KEY') or 'splendidsky'
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'splendidsky'
     SQLALCHEMY_COMMIT_TO_TEARDOWN = True
     FLASKY_MAIL_SUBJECT_PREFIX = '[FLASKY]'
-    FLASKY_MAIL_SENDER = 'Flasky Admin<cwc2323993@163.com>'
+    FLASKY_MAIL_SENDER = 'cwc2323993@163.com'
     FLASKY_ADMIN = os.environ.get('FLASKY_ADMIN')
 
     @staticmethod
@@ -15,7 +15,7 @@ class Config:
 class DevelopmentConfig(Config):
     DEBEG = True
     MAIL_SERVER = 'smtp.163.com'
-    MAIL_PORT = 587
+    MAIL_PORT = 25
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')

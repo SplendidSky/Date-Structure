@@ -16,6 +16,8 @@ login_manager.login_view = 'auth.login'
 
 def create_app(config_name):
     app = Flask(__name__)
+    if config_name != "production":
+        app.debug = True
     app.config.from_object(config[config_name])
     config[config_name].init_app(app)
 
@@ -25,7 +27,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
     login_manager.init_app(app)
-
+    
     from .main import main as main_blueprint
     from .auth import auth as auth_blueprint
     app.register_blueprint(main_blueprint)

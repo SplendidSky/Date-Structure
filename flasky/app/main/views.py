@@ -28,7 +28,3 @@ def index():
 def user(name):
     return render_template('/user.html', name=name)
 
-
-@auth.route('/login')
-def login():
-    return render_template('auth/login/html')
