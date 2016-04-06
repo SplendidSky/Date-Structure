@@ -29,15 +29,15 @@
         <Grid Grid.Row="1">
             <ScrollViewer>
                 <StackPanel>
-                    <Image  x:Name="Image" Source="Assets/background.jpg"  Width="350" Height="180" Stretch="UniformToFill"/>
+                    <Image  x:Name="Image" Source="{x:Bind SelectedItem.image, Mode=OneWay}"  Width="350" Height="180" Stretch="UniformToFill"/>
                     <RelativePanel Width="350">
                         <AppBarButton x:Name="SelectPictureButton" Icon="Pictures" Label="select" RelativePanel.AlignRightWithPanel="True" Click="SelectPictureButton_Click"/>
                     </RelativePanel>
-                    <TextBox x:Name="Title" Width="350" Header="Title" Margin="0,12,0,0" Text="{x:Bind Item.title, Mode=TwoWay}"/>
-                    <TextBox x:Name="Details" Width="350" Height="96" Margin="0,12,0,0" Header="Details" Text="{x:Bind Item.description, Mode=TwoWay}"/>
-                    <DatePicker x:Name="Date" Width="350" Margin="0,12,0,0" Header="Due Date" HorizontalAlignment="Center" Date="{x:Bind Item.date, Converter={StaticResource DateConverter}, Mode=TwoWay}"/>
+                    <TextBox x:Name="Title" Width="350" Header="Title" Margin="0,12,0,0" Text="{x:Bind SelectedItem.title, Mode=OneWay}"/>
+                    <TextBox x:Name="Details" Width="350" Height="96" Margin="0,12,0,0" Header="Details" Text="{x:Bind SelectedItem.description, Mode=OneWay}"/>
+                    <DatePicker x:Name="Date" Width="350" Margin="0,12,0,0" Header="Due Date" HorizontalAlignment="Center" Date="{x:Bind SelectedItem.date, Converter={StaticResource DateConverter}, Mode=OneWay}"/>
                     <RelativePanel Width="350" Margin="0,24,0,0">
-                        <Button x:Name="CreateOrUpdateButton" Content="{x:Bind Item.title, Converter={StaticResource ButtonTextConverter}, Mode=OneWay}" Click="CreateOrUpdateButton_Click"></Button>
+                        <Button x:Name="CreateOrUpdateButton"  Click="CreateOrUpdateButton_Click"></Button>
                         <Button x:Name="CancelButton" Content="Cancel" RelativePanel.AlignRightWithPanel="True" Click="CancelButton_Click"></Button>
                     </RelativePanel>
                 </StackPanel>

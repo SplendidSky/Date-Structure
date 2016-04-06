@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    
+
     <UserControl.Resources>
         <local:LineConverter x:Key="LineConverter"/>
         <!--<local:CheckBoxConverter x:Key="CheckBoxConverter"/>-->
@@ -53,11 +53,24 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock x:Name="textBlock" Grid.Row="0" TextWrapping="Wrap" Text="TODOS" Style="{StaticResource HeaderTextBlockStyle}" />
         <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <TextBox x:Name="QueryTextBox" Margin="20, 0, 20, 0"></TextBox>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Button x:Name="Query" Content="查询" HorizontalAlignment="Center" Margin="20" Click="Query_Click"></Button>
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
@@ -66,7 +79,7 @@
             <ListView x:Name="TodosListView" 
                       IsItemClickEnabled="True" 
                       ItemClick="TodosListView_ItemClicked" 
-                      ItemsSource="{x:Bind AllItems}" >
+                      ItemsSource="{x:Bind AllItems}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="md:TodoItem">
                         <Grid Height="100">
@@ -83,7 +96,7 @@
                                       Height="32" Width="32"/>
                             <Image x:Name="ListViewImage"
                                    Grid.Column="1" 
-                                   Source="Assets/background.jpg"
+                                   Source="{x:Bind image, Mode=OneWay}"
                                    Height="90" Width="90" Margin="0,3,12,7"/>
                             <TextBlock Text="{x:Bind title}" 
                                        Grid.Column="2" 
@@ -93,7 +106,7 @@
                                        FontSize="15" 
                                        LineHeight="20" 
                                        TextWrapping="Wrap" />
-                            <Line Visibility="{x:Bind completed, Converter={StaticResource LineConverter}, Mode=OneWay}"
+                            <Line Opacity="{x:Bind completed, Converter={StaticResource LineConverter}, Mode=OneWay}"
                                   Grid.Column="2" 
                                   Stretch="Fill" 
                                   Stroke="Black" 
@@ -103,12 +116,13 @@
                                   HorizontalAlignment="Stretch" 
                                   Margin="0,0,20,0"/>
                             <AppBarButton Icon="Setting" Grid.Column="3"  IsCompact="True" VerticalAlignment="Center" >
-                                                        <AppBarButton.Flyout>
-                            <MenuFlyout>
-                                <MenuFlyoutItem Text="Edit"/>
-                                <MenuFlyoutItem Text="Delete"/>
-                            </MenuFlyout>
-                        </AppBarButton.Flyout>
+                                <AppBarButton.Flyout>
+                                    <MenuFlyout>
+                                        <MenuFlyoutItem Text="Edit"/>
+                                        <MenuFlyoutItem Text="Delete"/>
+                                        <MenuFlyoutItem Name="Share" Text="Share" Click="Share_Click"/>
+                                    </MenuFlyout>
+                                </AppBarButton.Flyout>
                             </AppBarButton>
                         </Grid>
                     </DataTemplate>
@@ -138,8 +152,6 @@
                     </StackPanel>
                 </ScrollViewer>
             </Grid>
-
         </Grid>
     </Grid>
-
 </Page>

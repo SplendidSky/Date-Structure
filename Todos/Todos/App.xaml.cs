@@ -15,6 +15,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Todos.ViewModels;
+using Windows.Storage;
+using Newtonsoft.Json;
+using SQLitePCL;
 
 namespace Todos
 {
@@ -28,12 +31,12 @@ namespace Todos
         public object Convert(object value, Type targetType, object parameter, string language)
         {
             bool completed = (bool)value;
-            Windows.UI.Xaml.Visibility visibility;
+            double opacity;
             if (completed == false)
-                visibility = Visibility.Collapsed;
+                opacity = 0;
             else
-                visibility = Visibility.Visible;
-            return visibility;
+                opacity = 100;
+            return opacity;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, string language)
@@ -94,7 +97,8 @@ namespace Todos
 
     sealed partial class App : Application
     {
-
+        public int BackRequested { get; internal set; }
+        static public SQLiteConnection db;
         /// <summary>
         /// 初始化单一实例应用程序对象。这是执行的创作代码的第一行，
         /// 已执行，逻辑上等同于 main() 或 WinMain()。
@@ -119,7 +123,7 @@ namespace Todos
 #if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                this.DebugSettings.EnableFrameRateCounter = false ;
+                this.DebugSettings.EnableFrameRateCounter = false;
             }
 #endif
 
@@ -137,6 +141,10 @@ namespace Todos
                 if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
                 {
                     //TODO: 从之前挂起的应用程序加载状态
+                    if (ApplicationData.Current.LocalSettings.Values.ContainsKey("NavigationState"))
+                    {
+                        rootFrame.SetNavigationState((string)ApplicationData.Current.LocalSettings.Values["NavigationState"]);
+                    }
                 }
 
                 // 将框架放在当前窗口中
@@ -148,12 +156,13 @@ namespace Todos
                 // 当导航堆栈尚未还原时，导航到第一页，
                 // 并通过将所需信息作为导航参数传入来配置
                 // 参数
-                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                rootFrame.Navigate(typeof(MainPage));
             }
             // 确保当前窗口处于活动状态
             Window.Current.Activate();
-
             Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += OnBackRequested;
+            LoadDatabase();
+            Todos.ViewModels.TodoItemViewModel.LoadAll();
         }
 
         /// <summary>
@@ -166,6 +175,7 @@ namespace Todos
             throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
+        public event EventHandler<Windows.UI.Core.BackRequestedEventArgs> BackRequest;
         /// <summary>
         /// 在将要挂起应用程序执行时调用。  在不知道应用程序
         /// 无需知道应用程序会被终止还是会恢复，
@@ -177,6 +187,9 @@ namespace Todos
         {
             var deferral = e.SuspendingOperation.GetDeferral();
             //TODO: 保存应用程序状态并停止任何后台活动
+            Frame frame = Window.Current.Content as Frame;
+            ApplicationData.Current.LocalSettings.Values["NavigationState"] = frame.GetNavigationState();
+            Todos.ViewModels.TodoItemViewModel.SaveAll();
             deferral.Complete();
         }
 
@@ -185,12 +198,25 @@ namespace Todos
             Frame rootFrame = Window.Current.Content as Frame;
             if (rootFrame == null)
                 return;
-
-
             if (rootFrame.CanGoBack && e.Handled == false)
             {
                 e.Handled = true;
                 rootFrame.GoBack();
+            }
+        }
+
+        private void LoadDatabase()
+        {
+            db = new SQLiteConnection("Todos.db");
+            string sql = @"CREATE TABLE IF NOT EXISTS TodoItems (ID CHAR NOT NULL ON CONFLICT ROLLBACK, 
+                                                                               Title CHAR NOT NULL ON CONFLICT ROLLBACK, 
+                                                                               Description CHAR NOT NULL ON CONFLICT ROLLBACK, 
+                                                                               Completed BIT NOT NULL, 
+                                                                               Date DATE NOT NULL ON CONFLICT ROLLBACK,
+                                                                               ImageName CHAR NOT NULL ON CONFLICT ROLLBACK);";
+            using (var statement = db.Prepare(sql))
+            {
+                statement.Step();
             }
         }
     }

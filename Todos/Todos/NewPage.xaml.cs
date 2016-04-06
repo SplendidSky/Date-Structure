@@ -17,6 +17,9 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Popups;
 using Windows.Storage;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
+using Todos.ViewModels;
+using Windows.ApplicationModel;
 
 // “空白页”项模板在 http://go.microsoft.com/fwlink/?LinkId=234238 上提供
 
@@ -27,26 +30,85 @@ namespace Todos
     /// </summary>
     public sealed partial class NewPage : Page
     {
-        private Models.TodoItem Item = ViewModels.TodoItemViewModel.SelectedItem;
 
         public NewPage()
         {
             this.InitializeComponent();
+            var viewTitleBar = Windows.UI.ViewManagement.ApplicationView.GetForCurrentView().TitleBar;
+            viewTitleBar.BackgroundColor = Windows.UI.Colors.CornflowerBlue;
+            viewTitleBar.ButtonBackgroundColor = Windows.UI.Colors.CornflowerBlue;
+            //PreviousItem = TodoItemViewModel.Load();
+            SelectedItem = TodoItemViewModel.SelectedItem;
         }
 
+        Models.TodoItem SelectedItem;
+        Models.TodoItem Item;
+        //Models.TodoItem PreviousItem;
+        string ImageName = "background.jpg";
+        string ImagePath = Models.TodoItem.ImagePath;
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        //async void CopyImage()
+        //{
+        //    string sourece = ImagePath;
+        //    string target = Models.TodoItem.ImagePath + ImageName;
+        //    Windows.Storage.StorageFolder sourceFolder = await StorageFolder.GetFolderFromPathAsync(ImagePath);
+        //    Windows.Storage.StorageFolder targetFolder = await StorageFolder.GetFolderFromPathAsync(Models.TodoItem.ImagePath);
+        //    Windows.Storage.StorageFile file = await sourceFolder.GetFileAsync(ImageName);
+        //    await file.CopyAsync(targetFolder);
+        //    System.IO.File.Copy(sourece, target);
+        //}
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
-            Frame rootFrame = Window.Current.Content as Frame;
-
-            if (rootFrame.CanGoBack)
+            if (Window.Current.Content != null)
             {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Visible;
+                Frame rootFrame = Window.Current.Content as Frame;
+                if (rootFrame.CanGoBack)
+                {
+                    // Show UI in title bar if opted-in and in-app backstack is not empty.
+                    SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+                        AppViewBackButtonVisibility.Visible;
+                    ((App)App.Current).BackRequest += NewPageBackRequested;
+                    ((App)App.Current).Suspending += NewPageSuspending;
+                }
+                else
+                {
+                    // Remove the UI from the title bar if in-app back stack is empty.
+                    SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility =
+                        AppViewBackButtonVisibility.Collapsed;
+                }
+            }
+
+            if (true)
+            {
+                CreateOrUpdateButton.Content = "Create";
+                SelectedItem.title = Title.Text;
+                SelectedItem = new Models.TodoItem();
+                await SelectedItem.LoadImageAsync();
+                Image.Source = SelectedItem.image;
             }
             else
-            {
-                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = AppViewBackButtonVisibility.Collapsed;
-            }
+                CreateOrUpdateButton.Content = "Update";
+        }
+
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
+        {
+            //TodoItemViewModel.Save(SelectedItem.id, Title.Text, Details.Text, Date.Date.Date);
+            ((App)App.Current).BackRequest -= NewPageBackRequested;
+            ((App)App.Current).Suspending -= NewPageSuspending;
+            Item = new Models.TodoItem(SelectedItem.title, SelectedItem.description, SelectedItem.date, SelectedItem.image, SelectedItem.ImageName);
+            SelectedItem = null;
+            //base.OnNavigatedFrom(e);
+        }
+
+        private void NewPageBackRequested(object sender, BackRequestedEventArgs e)
+        {
+            //TodoItemViewModel.Save(Title.Text, Details.Text, Date.Date.Date, Image.Source, ImageName, Item);
+        }
+
+        private void NewPageSuspending(object sender, SuspendingEventArgs e)
+        {
+            //TodoItemViewModel.Save(Title.Text, Details.Text, Date.Date.Date, Image.Source, ImageName, Item);
         }
 
         private void CreateOrUpdateButton_Click(object sender, RoutedEventArgs e)
@@ -77,18 +139,12 @@ namespace Todos
             {
                 if ((string)CreateOrUpdateButton.Content == "Create")
                 {
-                    ViewModels.TodoItemViewModel.AddTodoItem(Title.Text, Details.Text, Date.Date.Date);
+                    TodoItemViewModel.AddTodoItem(Title.Text, Details.Text, Date.Date.Date, Image.Source, ImageName);
                 }
                 else
-                {
-                    ViewModels.TodoItemViewModel.SelectedItem.title = Title.Text;
-                    ViewModels.TodoItemViewModel.SelectedItem.description = Details.Text;
-                    ViewModels.TodoItemViewModel.SelectedItem.date = Date.Date.Date;
-                }
-
+                    TodoItemViewModel.UpdateTodoItem(TodoItemViewModel.SelectedItem.id, Title.Text, Details.Text, Date.Date.Date, Image.Source, ImageName);
                 Frame.Navigate(typeof(MainPage));
             }
-
 
         }
 
@@ -101,7 +157,7 @@ namespace Todos
                 Date.Date = DateTime.Now.Date;
             }
             Frame.Navigate(typeof(MainPage));
-            //Image.Source = new Windows.UI.Xaml.Media.Imaging.BitmapImage(new Uri("./Assets/background.jpg"));
+
         }
 
         private async void SelectPictureButton_Click(object sender, RoutedEventArgs e)
@@ -125,15 +181,20 @@ namespace Todos
                         new Windows.UI.Xaml.Media.Imaging.BitmapImage();
                     bitmapImage.SetSource(fileStream);
                     Image.Source = bitmapImage;
+                    ImageName = file.Name;
+                    ImagePath = file.Path;
+                    Windows.Storage.StorageFolder targetFolder = await StorageFolder.GetFolderFromPathAsync(Models.TodoItem.ImagePath);
+                    await file.CopyAsync(targetFolder, ImageName, NameCollisionOption.ReplaceExisting);
                 }
-
             }
         }
 
         private void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            ViewModels.TodoItemViewModel.RemoveTodoItem(Item.id);
+            TodoItemViewModel.RemoveTodoItem(TodoItemViewModel.SelectedItem.id);
+            TodoItemViewModel.SelectedItem = null;
             Frame.Navigate(typeof(MainPage));
         }
+
     }
 }
