@@ -36,6 +36,7 @@ namespace Turing
         public MainPage()
         {
             this.InitializeComponent();
+            Server();
         }
 
         private ObservableCollection<Message> Messages = ViewModel.MessageViewModel.Messages;
@@ -100,41 +101,55 @@ namespace Turing
             }
         }
 
-        public async Task<StreamSocket> InitialNetwork(HostName RemoteHost)
+        public async Task<StreamSocket> Client(HostName RemoteHost)
         {
-            var HostNames = NetworkInformation.GetHostNames();
-            var LocalHost = HostNames.FirstOrDefault(h =>
-            {
-                bool isIpaddr = h.Type == Windows.Networking.HostNameType.Ipv4;
-                // 如果不是IP地址表示的名称，则忽略
-                if (isIpaddr == false)
-                {
-                    return false;
-                }
-                IPInformation ipinfo = h.IPInformation;
-                // 71表示无线，6表示以太网
-                if (ipinfo.NetworkAdapter.IanaInterfaceType == 71 || ipinfo.NetworkAdapter.IanaInterfaceType == 6)
-                {
-                    return true;
-                }
-                return false;
-            });
-            EndpointPair EndPoint = new EndpointPair(LocalHost, "1117", RemoteHost, "1217");
+            //var HostNames = NetworkInformation.GetHostNames();
+            //var LocalHost = HostNames.FirstOrDefault(h =>
+            //{
+            //    bool isIpaddr = h.Type == Windows.Networking.HostNameType.Ipv4;
+            //    // 如果不是IP地址表示的名称，则忽略
+            //    if (isIpaddr == false)
+            //    {
+            //        return false;
+            //    }
+            //    IPInformation ipinfo = h.IPInformation;
+            //    // 71表示无线，6表示以太网
+            //    if (ipinfo.NetworkAdapter.IanaInterfaceType == 71 || ipinfo.NetworkAdapter.IanaInterfaceType == 6)
+            //    {
+            //        return true;
+            //    }
+            //    return false;
+            //});
+            var LocalHost = new HostName("127.0.0.1");
+            EndpointPair EndPoint = new EndpointPair(LocalHost, "", RemoteHost, "1117");
             StreamSocket client = new StreamSocket();
             await client.ConnectAsync(EndPoint);
             return client;
         }
 
-        public void Chat(StreamSocket client)
+        public async void Server()
+        {
+            StreamSocketListener listener = new StreamSocketListener();
+            await listener.BindServiceNameAsync("1217");
+            listener.ConnectionReceived += Listener_ConnectionReceived;
+        }
+
+        private void Listener_ConnectionReceived(StreamSocketListener sender, StreamSocketListenerConnectionReceivedEventArgs args)
+        {
+            client = args.Socket;
+        }
+
+        public void Chat()
         {
             var DataReader = new Windows.Storage.Streams.DataReader(client.InputStream);
             byte[] getByte = new byte[5000];
             DataReader.ReadBytes(getByte);
             Encoding code = Encoding.GetEncoding("UTF-8");
             string RemoteData = code.GetString(getByte, 0, getByte.Length);
+            Messages.Add(new Message("Your Friend", DateTime.Now, RemoteData, false));
             var DataWriter = new Windows.Storage.Streams.DataWriter(client.OutputStream);
             DataWriter.WriteString("test\n");
-            Messages.Add(new Message("test", DateTime.Now, textBox.Text, true));
+            Messages.Add(new Message("You", DateTime.Now, textBox.Text, true));
         }
 
         private async void TextBox_KeyUp(object sender, KeyRoutedEventArgs e)
@@ -149,23 +164,25 @@ namespace Turing
                 else if (textBox.Text == "Chat")
                 {
                     ChatMode = true;
-                    HostName RemoteHost = new HostName("172.18.70.124");
-                    client = await InitialNetwork(RemoteHost);
+                    HostName RemoteHost = new HostName("127.0.0.1");
+                    client = await Client(RemoteHost);
+                    textBox.Text = "";
                 }
                 else if (textBox.Text == "Turing")
                 {
                     ChatMode = false;
+                    textBox.Text = "";
                 }
                 else if (ChatMode)
                 {
-                    Chat(client);
+                    Chat();
                 }
                 else
                 {
                     Turing(textBox.Text);
                     //发送完消息后，清空消息框
+                    textBox.Text = "";
                 }
-                textBox.Text = "";
             }
         }
 
