@@ -32,14 +32,18 @@ namespace _2048
                     remains.Insert(remains.Count, i * 10 + j);
                 }
             randomProduce();
+            randomProduce();
         }
         public List<int> remains = new List<int>();
+        public List<int> nums = new List<int>();
         public void randomProduce()
         {
             int len = remains.Count;
             var ran = new Random();
             int ran_num = ran.Next(0, len);
             int pos = remains[ran_num];
+            remains.Remove(pos);
+            nums.Add(pos);
             Button obj = (Button)FindName("b" + pos);
             obj.Content = "2";
         }

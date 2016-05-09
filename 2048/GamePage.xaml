@@ -80,17 +80,17 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Height="100" Width="100" x:Name="b11">
-                        123
+                    <Button Grid.Column="0" Height="80" Width="80" x:Name="b11">
+                        
                     </Button>
-                    <Button Grid.Column="1" Height="100" Width="100"  x:Name="b12">
-                        123
+                    <Button Grid.Column="1" Height="80" Width="80"  x:Name="b12">
+                        
                     </Button>
-                    <Button Grid.Column="2" Height="100" Width="100" x:Name="b13">
-                        123
+                    <Button Grid.Column="2" Height="80" Width="80" x:Name="b13">
+                        
                     </Button>
-                    <Button Grid.Column="3" Height="100" Width="100" x:Name="b14">
-                        123
+                    <Button Grid.Column="3" Height="80" Width="80" x:Name="b14">
+                       
                     </Button>
                 </Grid>
                 <Grid Grid.Row="1">
@@ -100,17 +100,17 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Height="100" Width="100" x:Name="b21">
-                        123
+                    <Button Grid.Column="0" Height="80" Width="80" x:Name="b21">
+                        
                     </Button>
-                    <Button Grid.Column="1" Height="100" Width="100" x:Name="b22">
-                        123
+                    <Button Grid.Column="1" Height="80" Width="80" x:Name="b22">
+                        
                     </Button>
-                    <Button Grid.Column="2" Height="100" Width="100" x:Name="b23">
-                        123
+                    <Button Grid.Column="2" Height="80" Width="80" x:Name="b23">
+                        
                     </Button>
-                    <Button Grid.Column="3" Height="100" Width="100" x:Name="b24">
-                        123
+                    <Button Grid.Column="3" Height="80" Width="80" x:Name="b24">
+                        
                     </Button>
                 </Grid>
                 <Grid Grid.Row="2">
@@ -120,17 +120,17 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Height="100" Width="100" x:Name="b31">
-                        123
+                    <Button Grid.Column="0" Height="80" Width="80" x:Name="b31">
+                        
                     </Button>
-                    <Button Grid.Column="1" Height="100" Width="100" x:Name="b32">
-                        123
+                    <Button Grid.Column="1" Height="80" Width="80" x:Name="b32">
+                        
                     </Button>
-                    <Button Grid.Column="2" Height="100" Width="100" x:Name="b33">
-                        123
+                    <Button Grid.Column="2" Height="80" Width="80" x:Name="b33">
+                        
                     </Button>
-                    <Button Grid.Column="3" Height="100" Width="100" x:Name="b34">
-                        123
+                    <Button Grid.Column="3" Height="80" Width="80" x:Name="b34">
+                        
                     </Button>
                 </Grid>
                 <Grid Grid.Row="3">
@@ -140,17 +140,17 @@
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                         <ColumnDefinition Width="auto"></ColumnDefinition>
                     </Grid.ColumnDefinitions>
-                    <Button Grid.Column="0" Height="100" Width="100" x:Name="b41">
-                        123
+                    <Button Grid.Column="0" Height="80" Width="80" x:Name="b41">
+                        
                     </Button>
-                    <Button Grid.Column="1" Height="100" Width="100" x:Name="b42">
-                        123
+                    <Button Grid.Column="1" Height="80" Width="80" x:Name="b42">
+                        
                     </Button>
-                    <Button Grid.Column="2" Height="100" Width="100" x:Name="b43">
-                        123
+                    <Button Grid.Column="2" Height="80" Width="80" x:Name="b43">
+                        
                     </Button>
-                    <Button Grid.Column="3" Height="100" Width="100" x:Name="b44">
-                        123
+                    <Button Grid.Column="3" Height="80" Width="80" x:Name="b44" >
+                        
                     </Button>
                 </Grid>
 
