@@ -103,24 +103,26 @@ namespace Turing
 
         public async Task<StreamSocket> Client(HostName RemoteHost)
         {
-            //var HostNames = NetworkInformation.GetHostNames();
-            //var LocalHost = HostNames.FirstOrDefault(h =>
-            //{
-            //    bool isIpaddr = h.Type == Windows.Networking.HostNameType.Ipv4;
-            //    // 如果不是IP地址表示的名称，则忽略
-            //    if (isIpaddr == false)
-            //    {
-            //        return false;
-            //    }
-            //    IPInformation ipinfo = h.IPInformation;
-            //    // 71表示无线，6表示以太网
-            //    if (ipinfo.NetworkAdapter.IanaInterfaceType == 71 || ipinfo.NetworkAdapter.IanaInterfaceType == 6)
-            //    {
-            //        return true;
-            //    }
-            //    return false;
-            //});
-            var LocalHost = new HostName("127.0.0.1");
+            // 获取本机IP
+            var HostNames = NetworkInformation.GetHostNames();
+            var LocalHost = HostNames.FirstOrDefault(h =>
+            {
+                bool isIpaddr = h.Type == Windows.Networking.HostNameType.Ipv4;
+                // 如果不是IP地址表示的名称，则忽略
+                if (isIpaddr == false)
+                {
+                    return false;
+                }
+                IPInformation ipinfo = h.IPInformation;
+                // 71表示无线，6表示以太网
+                if (ipinfo.NetworkAdapter.IanaInterfaceType == 71 || ipinfo.NetworkAdapter.IanaInterfaceType == 6)
+                {
+                    return true;
+                }
+                return false;
+            });
+
+            //尝试连接远程主机的1117端口
             EndpointPair EndPoint = new EndpointPair(LocalHost, "", RemoteHost, "1117");
             StreamSocket client = new StreamSocket();
             await client.ConnectAsync(EndPoint);
@@ -129,8 +131,9 @@ namespace Turing
 
         public async void Server()
         {
+            // 监听本机的1117端口
             StreamSocketListener listener = new StreamSocketListener();
-            await listener.BindServiceNameAsync("1217");
+            await listener.BindServiceNameAsync("1117");
             listener.ConnectionReceived += Listener_ConnectionReceived;
         }
 
@@ -164,6 +167,7 @@ namespace Turing
                 else if (textBox.Text == "Chat")
                 {
                     ChatMode = true;
+                    // 修改此处IP地址可与同一网段内的主机通信
                     HostName RemoteHost = new HostName("127.0.0.1");
                     client = await Client(RemoteHost);
                     textBox.Text = "";
